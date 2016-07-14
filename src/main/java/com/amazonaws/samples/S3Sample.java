@@ -36,6 +36,7 @@ import com.amazonaws.services.s3.model.Bucket;
 import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.ListObjectsRequest;
 import com.amazonaws.services.s3.model.ObjectListing;
+import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
@@ -57,22 +58,37 @@ import java.util.Scanner;
 public class S3Sample {
 
     public void printListOfBuckets(AmazonS3 s3){
-        System.out.println("Listing buckets");
-        for (Bucket bucket : s3.listBuckets()) {
-            System.out.println(" - " + bucket.getName());
-        }
-        System.out.println();
+        try{
+            System.out.println("Listing buckets");
+            for (Bucket bucket : s3.listBuckets()) {
+                System.out.println(" - " + bucket.getName());
+                bucketsList.add(bucket.getName());
+            }
+            System.out.println();
+        }catch (AmazonServiceException ase) {
+                System.out.println("Caught an AmazonServiceException, which means your request made it "
+                        + "to Amazon S3, but was rejected with an error response for some reason.");
+                System.out.println("Error Message:    " + ase.getMessage());
+                System.out.println("HTTP Status Code: " + ase.getStatusCode());
+                System.out.println("AWS Error Code:   " + ase.getErrorCode());
+                System.out.println("Error Type:       " + ase.getErrorType());
+                System.out.println("Request ID:       " + ase.getRequestId());
+            } catch (AmazonClientException ace) {
+                System.out.println("Caught an AmazonClientException, which means the client encountered "
+                        + "a serious internal problem while trying to communicate with S3, "
+                        + "such as not being able to access the network.");
+                System.out.println("Error Message: " + ace.getMessage());
+            }
     }
     
     Scanner scan=new Scanner(System.in);
     ArrayList<String> bucketsList = new ArrayList<String>();
     
-    public void menu(AmazonS3 s3) throws IOException{
+    public void menu(AmazonS3 s3) throws IOException, Exception{
         System.out.println("===========================================");
-        System.out.println("Getting Started with Amazon S3");
+        System.out.println("Manhunter");
         System.out.println("===========================================\n");
         
-        String filesPath="C:\\Users\\Ygor Santos\\aws-sdk-java\\aws-java-sample";
         FilesManagement filemgt = new FilesManagement();
         
         boolean startOver=true;
@@ -83,17 +99,22 @@ public class S3Sample {
             System.out.println("===========================================");
             System.out.println("Choose your option");
             System.out.println("===========================================");
-            System.out.println("1 - Create buckets with the files in the folder");
+            System.out.println("1 - Create buckets");
             System.out.println("2 - List buckets");
             System.out.println("3 - Delete buckets");
-            System.out.println("4 - Exit");
+            System.out.println("4 - Download Object");
+            System.out.println("5 - Exit");
             System.out.print("Type your option: ");
             option=scan.nextInt();
 
             switch(option){
                 case 1:
-                    while(filemgt.sequentialFiles(filesPath)!=null){
-                        createBuckets(s3);
+                    ArrayList<File> listOfFiles=filemgt.sequentialFiles("object");
+                    if(listOfFiles==null){
+                        System.out.println("Error! No files found!");
+                    }
+                    for(int i=0;i<listOfFiles.size();i++){
+                        createBuckets(s3,listOfFiles.get(i));
                     }
                 break;
                 case 2:
@@ -103,8 +124,12 @@ public class S3Sample {
                     deleteBucket(s3); 
                 break;
                 case 4:
+                    downloadObject(s3, filemgt);
+                break;
+                case 5:
                     System.out.println("Exiting.");
                     startOver=false;
+                break;
                 default:
                     System.out.println("Invalid Option! Try again.");
                 break;
@@ -113,28 +138,42 @@ public class S3Sample {
     }
     
     public void deleteBucket(AmazonS3 s3){
-        System.out.print("Please type the bucket name: ");
-        String bucketName=scan.next();
-        for(int i=0;i<bucketsList.size();i++){
-            if(bucketsList.get(i)==bucketName){
-                System.out.println("Deleting an object\n");
-                s3.deleteObject(bucketName, key);
-
-                /*
-                 * Delete a bucket - A bucket must be completely empty before it can be
-                 * deleted, so remember to delete any objects from your buckets before
-                 * you try to delete them.
-                 */
-                System.out.println("Deleting bucket " + bucketName + "\n");
-                s3.deleteBucket(bucketName);
-                return;
+        try{
+            System.out.print("Please type the bucket name: ");
+            String bucketName=scan.next();
+            for(int i=0;i<bucketsList.size();i++){
+                if(bucketsList.get(i)==bucketName){
+                    System.out.println("Deleting an object\n");
+                    s3.deleteObject(bucketName, "manhunter");
+                    /*
+                     * Delete a bucket - A bucket must be completely empty before it can be
+                     * deleted, so remember to delete any objects from your buckets before
+                     * you try to delete them.
+                     */
+                    System.out.println("Deleting bucket " + bucketName + "\n");
+                    s3.deleteBucket(bucketName);
+                    return;
+                }
             }
-        }
-        System.out.println("Bucket not found.");
+            System.out.println("Bucket not found.");
+        }catch (AmazonServiceException ase) {
+                System.out.println("Caught an AmazonServiceException, which means your request made it "
+                        + "to Amazon S3, but was rejected with an error response for some reason.");
+                System.out.println("Error Message:    " + ase.getMessage());
+                System.out.println("HTTP Status Code: " + ase.getStatusCode());
+                System.out.println("AWS Error Code:   " + ase.getErrorCode());
+                System.out.println("Error Type:       " + ase.getErrorType());
+                System.out.println("Request ID:       " + ase.getRequestId());
+            } catch (AmazonClientException ace) {
+                System.out.println("Caught an AmazonClientException, which means the client encountered "
+                        + "a serious internal problem while trying to communicate with S3, "
+                        + "such as not being able to access the network.");
+                System.out.println("Error Message: " + ace.getMessage());
+            }
     }
     
     
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, Exception {
         /*
          * Create your credentials file at ~/.aws/credentials (C:\Users\USER_NAME\.aws\credentials for Windows users) 
          * and save the following lines after replacing the underlined values with your own.
@@ -147,35 +186,54 @@ public class S3Sample {
         S3Sample s3sample = new S3Sample();
         
         ClientConfiguration opts = new ClientConfiguration();
-        opts.setSignerOverride("S3SignerType");  // NOT "AWS3SignerType"  -- mentioned by Steve Jones set signatures back to v2.
+        opts.setSignerOverride("S3SignerType");
         
         AmazonS3 s3 = new AmazonS3Client(opts);
-        //Region usWest2 = Region.getRegion(Regions.US_WEST_2);
-        //s3.setRegion(usWest2);
         
         s3.setEndpoint("http://objectstorage.sat.iit.edu:8773/services/objectstorage/");
         s3.setS3ClientOptions(new S3ClientOptions().withPathStyleAccess( true ) );
         
         s3sample.menu(s3);
     }
-    public void createBuckets(AmazonS3 s3) throws IOException{
+    
+    public void downloadObject(AmazonS3 s3, FilesManagement mgt) throws IOException{
+        String key="manhunter";
+        //S3Object object = s3.getObject(new GetObjectRequest("manhunter-s3-bucket-1468091409", "file"));
+        
+        S3Object object = s3.getObject("manhunter-s3-bucket-1468091409", key);
+        BufferedReader reader = new BufferedReader(new InputStreamReader(object.getObjectContent()));
+        //File file = new File("localFilename");      
+        //Writer writer = new OutputStreamWriter(new FileOutputStream(file));
+
+        while (true) {          
+             String line = reader.readLine();           
+             if (line == null)
+                  break;            
+            System.out.println(line + "\n");
+        }
+        
         /*
-        ClientConfiguration opts = new ClientConfiguration();
-        opts.setSignerOverride("S3SignerType");  // NOT "AWS3SignerType"  -- mentioned by Steve Jones set signatures back to v2.
         
-        AmazonS3 s3 = new AmazonS3Client(opts);
+        //printListOfBuckets(s3);
         
-        
-        s3.setEndpoint("http://objectstorage.sat.iit.edu:8773/services/objectstorage/");
-        s3.setS3ClientOptions(new S3ClientOptions().withPathStyleAccess( true ) );
+        S3Object object = s3.getObject(new GetObjectRequest(bucketsList.get(27), key));
+        //System.out.println("Content-Type: "  + object.getObjectMetadata().getContentType());
+        System.out.println(object.getObjectContent());
+        GetObjectRequest rangeObjectRequest = new GetObjectRequest(bucketsList.get(27), key);
+        S3Object objectPortion = s3.getObject(rangeObjectRequest);
+        InputStream objectData = objectPortion.getObjectContent();
+        mgt.readFile(objectData);
+        //displayTextInputStream(objectData);
+        //objectData.close();
         */
+    }
+    
+    public void createBuckets(AmazonS3 s3, File fileName) throws IOException{
         long timestamp = System.currentTimeMillis() / 1000;
-        //insert my name here and a timestamp
-        String bucketName = "ygors-s3-bucket-" + timestamp; //UUID.randomUUID();
-        String key = Long.toString(timestamp);
-        
-        
-        
+        System.out.println("Entering createBuckets function. timestamp inicialized as: "+timestamp);
+        String bucketName = "manhunter-s3-bucket-" + timestamp; //UUID.randomUUID();
+        String key = "manhunter";//Long.toString(timestamp);
+        ObjectMetadata metadata = new ObjectMetadata();
         
             try {
                 /*
@@ -188,8 +246,7 @@ public class S3Sample {
                  */
                 
                 timestamp = System.currentTimeMillis() / 1000;
-                //insert my name here and a timestamp
-                bucketName = "ygors-s3-bucket-" + timestamp;
+                bucketName = "manhunter-s3-bucket-" + timestamp;
                 
                 System.out.println("Creating bucket " + bucketName + "\n");
                 s3.createBucket(bucketName);
@@ -209,7 +266,16 @@ public class S3Sample {
                  * specific to your applications.
                  */
                 System.out.println("Uploading a new object to S3 from a file\n");
-                s3.putObject(new PutObjectRequest(bucketName, key, createSampleFile()));
+                PutObjectRequest por=new PutObjectRequest(bucketName, key, fileName);
+                por.setMetadata(metadata);//.setMetadata(metadata));
+                s3.putObject(por);
+                
+                //Options to send metadata while also creating the buckets
+                
+                //s3.putObject(bucketName, key, fileName, objmetadata);
+                //s3.putObject(new PutObjectRequest(bucketName,key,fileName));
+                //s3.putObject(bucketName, key, input, objmetadata)
+                
 
                 /*
                  * Download an object - When you download an object, you get all of
@@ -223,10 +289,8 @@ public class S3Sample {
                  * conditional downloading of objects based on modification times,
                  * ETags, and selectively downloading a range of an object.
                  */
-                System.out.println("Downloading an object");
-                S3Object object = s3.getObject(new GetObjectRequest(bucketName, key));
-                System.out.println("Content-Type: "  + object.getObjectMetadata().getContentType());
-                displayTextInputStream(object.getObjectContent());
+                //System.out.println("Downloading an object");
+                
 
                 /*
                  * List objects in your bucket by prefix - There are many options for
@@ -236,7 +300,8 @@ public class S3Sample {
                  * use the AmazonS3.listNextBatchOfObjects(...) operation to retrieve
                  * additional results.
                  */
-                System.out.println("Listing objects");
+                
+                /*
                 ObjectListing objectListing = s3.listObjects(new ListObjectsRequest()
                         .withBucketName(bucketName)
                         .withPrefix("My"));
@@ -245,6 +310,7 @@ public class S3Sample {
                             "(size = " + objectSummary.getSize() + ")");
                 }
                 System.out.println();
+                */
 
                 /*
                  * Delete an object - Unless versioning has been turned on for your bucket,
@@ -268,14 +334,31 @@ public class S3Sample {
         }
     
     private static void displayTextInputStream(InputStream input) throws IOException {
+        /*
         BufferedReader reader = new BufferedReader(new InputStreamReader(input));
         while (true) {
             String line = reader.readLine();
-            if (line == null) break;
-
+            if (line == null){
+                System.out.println("Entered if.");
+                break;
+            }
+            System.out.println("I'm here.");
             System.out.println("    " + line);
         }
         System.out.println();
+        */
+        StringBuilder sb=new StringBuilder();
+        BufferedReader br = new BufferedReader(new InputStreamReader(input));
+        String read;
+
+        while((read=br.readLine()) != null) {
+            //System.out.println(read);
+            sb.append(read);   
+        }
+
+        br.close();
+        System.out.println(sb.toString());
+        //return sb.toString();
     }
     
 }
