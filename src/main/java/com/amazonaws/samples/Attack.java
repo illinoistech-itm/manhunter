@@ -23,6 +23,12 @@ public class Attack {
     
     FilesManagement fmgt = new FilesManagement();
     ArrayList<String> allWords = new ArrayList<String>();
+    int [][] invertedMatrix;
+    
+    /*
+    This function builds a 2-d array where each row corresponds to an encrypted keyword and each column corresponds to a document. 
+    The entries of the matrix will be ‘1’ (or the count) if the word appears in the document, and ‘0’ if it doesn’t.
+    */
     
     public void invertedMatrix(int numberOfFiles, int numberOfWords, ArrayList<String[]> keypairwords, ArrayList<File> metadataFileList, ArrayList<File> filesList) throws IOException{
         
@@ -46,7 +52,7 @@ public class Attack {
             }*/
         }
         
-        int[][] invertedMatrix = new int[allWords.size()][metadataFileList.size()];
+        invertedMatrix = new int[allWords.size()][metadataFileList.size()];
         
         for(int row=0;row<allWords.size();row++){
             for(int column=0;column<metadataFileList.size();column++){
@@ -61,6 +67,26 @@ public class Attack {
         }
         
     }
+    
+    /*
+    Utility function that returns the number of nonzero columns for any given row.
+    This is the result count—the number of documents matching each keyword.
+    */
+    
+    public int countNonZeroColumns(String word){
+        int count=0;
+        for(int column=0;column<invertedMatrix[0].length;column++){
+            if(invertedMatrix[allWords.indexOf(word)][column]==1){
+                count++;
+            }
+        }
+        return count;
+    }
+    
+    /*
+    Functions to support the creation of Matrix
+    */
+    
     
     public String convertInputStreamToString(InputStream is){
         String content = new Scanner(is,"UTF-8").useDelimiter("\\A").next();
