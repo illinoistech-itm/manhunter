@@ -114,7 +114,7 @@ public class S3Sample {
                         System.out.println("Error! No files found!");
                     }
                     for(int i=0;i<listOfFiles.size();i++){
-                        createBuckets(s3,listOfFiles.get(i));
+                        createBuckets(s3,listOfFiles.get(i),filemgt);
                     }
                 break;
                 case 2:
@@ -228,7 +228,7 @@ public class S3Sample {
         */
     }
     
-    public void createBuckets(AmazonS3 s3, File fileName) throws IOException{
+    public void createBuckets(AmazonS3 s3, File fileName, FilesManagement filemgt) throws IOException{
         long timestamp = System.currentTimeMillis() / 1000;
         System.out.println("Entering createBuckets function. timestamp inicialized as: "+timestamp);
         String bucketName = "manhunter-s3-bucket-" + timestamp; //UUID.randomUUID();
@@ -265,8 +265,11 @@ public class S3Sample {
                  * like content-type and content-encoding, plus additional metadata
                  * specific to your applications.
                  */
+                ArrayList<String> KeyPairs = new ArrayList<String>();
                 System.out.println("Uploading a new object to S3 from a file\n");
                 PutObjectRequest por=new PutObjectRequest(bucketName, key, fileName);
+                
+               // KeyPairs=filemgt.readMetadataFile(fileName);
                 por.setMetadata(metadata);//.setMetadata(metadata));
                 s3.putObject(por);
                 
