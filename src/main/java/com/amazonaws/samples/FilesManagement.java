@@ -22,6 +22,7 @@ public class FilesManagement {
     ArrayList<File> metadataFileList = new ArrayList<File>();
     File folder = new File(filesPath);
     File listOfFiles[] = folder.listFiles();
+    int numberOfFiles;
     
     public FilesManagement(){
         filesPath="src/data";
@@ -64,6 +65,7 @@ public class FilesManagement {
         
         
         if(type=="object"){
+            numberOfFiles=fileList.size();
             return fileList;
         }
         else{
@@ -74,6 +76,23 @@ public class FilesManagement {
                 return null;
             }
         }
+    }
+    
+    public void insertionSort(ArrayList<Integer> vetor) {
+        long trocas=0;
+        int eleito;
+        for (int i = 1; i < vetor.size(); i++) {
+            eleito = vetor.get(i);
+            int j;
+            for (j = i-1; (j >= 0) && (vetor.get(j) > eleito); j--) {
+                //vetor[j+1] = vetor[j];
+                vetor
+                trocas++;
+            }
+            vetor[j+1] = eleito;
+        }
+        System.out.println("Número de trocas: "+trocas);
+        //return vetor;
     }
 
     

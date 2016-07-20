@@ -5,10 +5,15 @@
  */
 package com.amazonaws.samples;
 
+import java.util.ArrayList;
+
 /**
  *
  * @author Ygor Santos
  */
 public class Attack {
-    
+    public void invertedMatrix(int numberOfFiles, int numberOfWords, ArrayList<String> words){
+        int[][] invertedMatrix = new int[numberOfWords][numberOfFiles];
+        
+    }
 }
