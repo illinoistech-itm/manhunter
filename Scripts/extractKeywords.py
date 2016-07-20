@@ -6,8 +6,12 @@
 
 from sys import argv
 import nltk
+import hashlib
 from collections import Counter
 from nltk.corpus import stopwords
+
+hex_dig=[]
+hashFrequency=[]
 
 # load text file
 script, filename = argv
@@ -32,13 +36,30 @@ stopwords = stopwords.words('english')
 # For each token that is not on the dictionary of stopwords
 filteredWords = [token for token in tokens if token not in stopwords]
 
+# Let's convert the metadata words to SHA-256
+for word in filteredWords:
+	hash_object = hashlib.sha256(str(word))
+	hex_dig.append(hash_object.hexdigest())
+
 # Parse to the termFrequency object the frequency of the filtered words
 termFrequency = Counter(filteredWords)
 
-txtOut = open(filename + "Data", "w")
-
 for key, value in termFrequency.items():
-	txtOut.write(str(key) + ":" + str(value) + "\n")
+	hashFrequency.append(value)
+
+txtOut = open(filename + "Data", "w")
+for key in hex_dig:
+	txtOut.write(str(key) + "\n")
+
+#for key, value in termFrequency.items():
+#	txtOut.write(str(key) + ":" + str(value) + "\n")
 #	print(key,value)
+
+txtOut.close()
+
+txtOut = open(filename + "Data", "r")
+for key, value in termFrequency.items():
+        for line in txtOut:
+		line.rstrip("\n") + str(value)
 
 txtOut.close()
