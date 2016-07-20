@@ -77,7 +77,7 @@ public class FilesManagement {
             }
         }
     }
-    
+    /*
     public void insertionSort(ArrayList<Integer> vetor) {
         long trocas=0;
         int eleito;
@@ -94,6 +94,7 @@ public class FilesManagement {
         System.out.println("Número de trocas: "+trocas);
         //return vetor;
     }
+*/
 
     
     public void readFile(InputStream file) throws FileNotFoundException, IOException{
@@ -132,6 +133,7 @@ public class FilesManagement {
         
         return fileContent;
     }
+    
     
     
     public void readMetadataFile(ObjectMetadata objmetadata, File file) throws IOException{
