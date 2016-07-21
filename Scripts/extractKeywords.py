@@ -10,8 +10,8 @@ import hashlib
 from collections import Counter
 from nltk.corpus import stopwords
 
-hex_dig=[]
-hashFrequency=[]
+hex_dig=[] #Keeps the words in SHA256 format
+hashFrequency=[] #Keeps the frequency of the words as they appear in the text
 
 # load text file
 script, filename = argv
@@ -36,30 +36,27 @@ stopwords = stopwords.words('english')
 # For each token that is not on the dictionary of stopwords
 filteredWords = [token for token in tokens if token not in stopwords]
 
-# Let's convert the metadata words to SHA-256
-for word in filteredWords:
-	hash_object = hashlib.sha256(str(word))
-	hex_dig.append(hash_object.hexdigest())
-
 # Parse to the termFrequency object the frequency of the filtered words
 termFrequency = Counter(filteredWords)
 
+# Let's convert the metadata words to SHA-256
+for key, value in termFrequency.items():
+        hash_object = hashlib.sha256(str(key))
+        hex_dig.append(hash_object.hexdigest())
+
+# Let's add the metadata to a list, easier to manage
 for key, value in termFrequency.items():
 	hashFrequency.append(value)
 
-txtOut = open(filename + "Data", "w")
-for key in hex_dig:
-	txtOut.write(str(key) + "\n")
-
-#for key, value in termFrequency.items():
-#	txtOut.write(str(key) + ":" + str(value) + "\n")
-#	print(key,value)
-
+# Writing the values to a file. 
+txtOut = open(filename + "Data", "w+")
+for key, value in zip(hex_dig, hashFrequency):
+	txtOut.write(str(key) + ":" + str(value) + "\n")
 txtOut.close()
 
-txtOut = open(filename + "Data", "r")
-for key, value in termFrequency.items():
-        for line in txtOut:
-		line.rstrip("\n") + str(value)
+# -= Debug Options =-
+#print("Word Frequency List Size: " + str(len(termFrequency)))
+#print("Hash words list size: " + str(len(hex_dig)))
+#print("Hash Frequency list size: " + str(len(hashFrequency)))
+#print(termFrequency)
 
-txtOut.close()
