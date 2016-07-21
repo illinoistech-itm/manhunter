@@ -90,7 +90,6 @@ public class S3Sample {
         System.out.println("===========================================\n");
         
         FilesManagement filemgt = new FilesManagement();
-        
         boolean startOver=true;
         
         while(startOver){

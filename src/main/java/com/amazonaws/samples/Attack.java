@@ -24,6 +24,7 @@ public class Attack {
     FilesManagement fmgt = new FilesManagement();
     ArrayList<String> allWords = new ArrayList<String>();
     int [][] invertedMatrix;
+    ArrayList<String[]>wordsInFilesCount = new ArrayList<String[]>();
     
     /*
     This function builds a 2-d array where each row corresponds to an encrypted keyword and each column corresponds to a document. 
@@ -65,7 +66,6 @@ public class Attack {
                 }
             }
         }
-        
     }
     
     /*
@@ -73,21 +73,27 @@ public class Attack {
     This is the result count—the number of documents matching each keyword.
     */
     
+    
+    //This function must be called from within a loop going through every word in the list of words.
     public int countNonZeroColumns(String word){
         int count=0;
         for(int column=0;column<invertedMatrix[0].length;column++){
             if(invertedMatrix[allWords.indexOf(word)][column]==1){
                 count++;
+                
+                
             }
         }
+        String [] keywordAndCount = new String[1];
+        keywordAndCount[0]=word;
+        keywordAndCount[1]=Integer.toString(count);
+        wordsInFilesCount.add(keywordAndCount);
         return count;
     }
     
     /*
     Functions to support the creation of Matrix 
     */
-    
-    
     public String convertInputStreamToString(InputStream is){
         String content = new Scanner(is,"UTF-8").useDelimiter("\\A").next();
         return content;
@@ -106,8 +112,7 @@ public class Attack {
 
         } finally {
             br.close();
-        }
-        
+        }  
     }
     
     public ArrayList<String> readWordsInFile(File file) throws FileNotFoundException, IOException{
