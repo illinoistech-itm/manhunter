@@ -14,6 +14,7 @@ import java.io.InputStream;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.*;
 
 /**
  *
@@ -80,8 +81,6 @@ public class Attack {
         for(int column=0;column<invertedMatrix[0].length;column++){
             if(invertedMatrix[allWords.indexOf(word)][column]==1){
                 count++;
-                
-                
             }
         }
         String [] keywordAndCount = new String[1];
@@ -91,6 +90,26 @@ public class Attack {
         return count;
     }
     
+    public void testingSortingTheList(){
+        int max=-1;
+        ArrayList<String[]>sortedList=new ArrayList<String[]>();
+        String[]y=new String[1];
+        String[]higherNumberArray;
+        while(wordsInFilesCount.size()!=0){
+            for(int i=0;i<wordsInFilesCount.size();i++){
+                y=wordsInFilesCount.get(i);
+                int yCount=Integer.parseInt(y[1]);
+                if(yCount>max){
+                    max=yCount;
+                    higherNumberArray=y;
+                }
+            }
+            sortedList.add(y);
+            wordsInFilesCount.remove(y);
+        }
+        wordsInFilesCount=sortedList;   
+    }
+   
     /*
     Functions to support the creation of Matrix 
     */
