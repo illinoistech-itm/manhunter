@@ -264,11 +264,14 @@ public class S3Sample {
                  * like content-type and content-encoding, plus additional metadata
                  * specific to your applications.
                  */
-                ArrayList<String> KeyPairs = new ArrayList<String>();
+                ArrayList<String[]> keyPairs = new ArrayList<String[]>();
                 System.out.println("Uploading a new object to S3 from a file\n");
                 PutObjectRequest por=new PutObjectRequest(bucketName, key, fileName);
-                
+                keyPairs=filemgt.wordSplit(filemgt.readMetadataFile(fileName));
                // KeyPairs=filemgt.readMetadataFile(fileName);
+               for(int i=0;i<keyPairs.size();i++){
+                   metadata.addUserMetadata((keyPairs.get(i))[0], (keyPairs.get(i))[1]);
+               }
                 por.setMetadata(metadata);//.setMetadata(metadata));
                 s3.putObject(por);
                 

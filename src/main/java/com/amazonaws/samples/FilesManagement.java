@@ -47,7 +47,8 @@ public class FilesManagement {
                 String filename = listOfFiles[i].getName();
                 if(filename.substring(filename.length()-1)=="M"){
                     //Gabriel
-                    //formatMetadata(listOfFiles[i]);
+                    InputStream fileContent = readMetadataFile(listOfFiles[i]);
+                    wordSplit(fileContent);
                     metadataFileList.add(listOfFiles[i]);
                     //System.out.println(filename);
                 }
@@ -136,7 +137,46 @@ public class FilesManagement {
         return fileContent;
     }
     
-    
+    public ArrayList<String[]> wordSplit(InputStream file) throws IOException{
+        BufferedReader br = new BufferedReader(new InputStreamReader(file));
+        ArrayList<String[]> wordList = new ArrayList<String[]>();
+        String line = br.readLine(); 
+        while (line != null) {
+            String[] words = line.split(",");
+            wordList.add(words);
+        }
+      // return(wordList);    
+   
+         //insertionsort - Sort data 
+           
+        int i=0;
+        int j=0;                   
+        int key = 0,keyO = 0;               
+        int keyT=0;
+        for (i = 1; i < wordList.size() ; i++)    // Start with 1 (not 0)
+        {
+            String k[] = wordList.get(i);  
+            String g[] = wordList.get(i-1);
+            key = Integer.parseInt(k[1]);
+            for(j = i-1; j>=0; j--)   // Smaller values are moving up
+            {
+                String t[] = wordList.get(j);
+                keyT = Integer.parseInt(t[1]);
+                if(key < keyT){
+                    wordList.set(j+1, t);
+                    if(j == 0 ){
+                        wordList.set(0,k);
+                    }
+                }
+                else
+                {
+                    wordList.set(j+1,k);
+                    break;
+                }
+            }
+        }
+        return wordList;
+    }
     
     public void readMetadataFile(ObjectMetadata objmetadata, File file) throws IOException{
         

@@ -90,7 +90,7 @@ public class Attack {
         return count;
     }
     
-    public void testingSortingTheList(){
+    public void SortingTheList(){
         int max=-1;
         ArrayList<String[]>sortedList=new ArrayList<String[]>();
         String[]y=new String[1];
