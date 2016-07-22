@@ -47,8 +47,8 @@ public class FilesManagement {
                 String filename = listOfFiles[i].getName();
                 if(filename.substring(filename.length()-1)=="M"){
                     //Gabriel
-                    InputStream fileContent = readMetadataFile(listOfFiles[i]);
-                    wordSplit(fileContent);
+                    //InputStream fileContent = readMetadataFile(listOfFiles[i]);
+                    //wordSplit(fileContent);
                     metadataFileList.add(listOfFiles[i]);
                     //System.out.println(filename);
                 }
@@ -137,12 +137,36 @@ public class FilesManagement {
         return fileContent;
     }
     
+    public void readMetadataFile(ObjectMetadata objmetadata, File file) throws IOException{
+        
+        BufferedReader br = new BufferedReader(new FileReader(file));
+        try {
+            //StringBuilder sb = new StringBuilder();
+            String line = br.readLine();
+
+            while (line != null) {
+                //One option would be:
+                //objmetadata.addUserMetadata("manhunter", line);
+
+                line = br.readLine();
+            }
+            //String everything = sb.toString();
+            //System.out.println(everything);
+        } finally {
+            br.close();
+        }
+    }
+    
+    /*
+    Gabriel's Code
+    */
+    
     public ArrayList<String[]> wordSplit(InputStream file) throws IOException{
         BufferedReader br = new BufferedReader(new InputStreamReader(file));
         ArrayList<String[]> wordList = new ArrayList<String[]>();
         String line = br.readLine(); 
         while (line != null) {
-            String[] words = line.split(",");
+            String[] words = line.split(":");
             wordList.add(words);
         }
       // return(wordList);    
@@ -176,25 +200,5 @@ public class FilesManagement {
             }
         }
         return wordList;
-    }
-    
-    public void readMetadataFile(ObjectMetadata objmetadata, File file) throws IOException{
-        
-        BufferedReader br = new BufferedReader(new FileReader(file));
-        try {
-            //StringBuilder sb = new StringBuilder();
-            String line = br.readLine();
-
-            while (line != null) {
-                //One option would be:
-                //objmetadata.addUserMetadata("manhunter", line);
-
-                line = br.readLine();
-            }
-            //String everything = sb.toString();
-            //System.out.println(everything);
-        } finally {
-            br.close();
-        }
     }
 }
