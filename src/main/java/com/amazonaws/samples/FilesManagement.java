@@ -15,7 +15,7 @@ import java.util.ArrayList;
  */
 public class FilesManagement {
     
-    String filesPath="src/data";
+    String filesPath;//="src/encryptedData";
     ArrayList<String> fileNames=new ArrayList<String>();
     ArrayList<String> MetadataFileNames=new ArrayList<String>();
     ArrayList<File> fileList = new ArrayList<File>();
@@ -23,13 +23,13 @@ public class FilesManagement {
     File folder = new File(filesPath);
     File listOfFiles[] = folder.listFiles();
     int numberOfFiles;
-    /*
-    public FilesManagement(){
-        filesPath="src/data";
+    
+    public FilesManagement(String path){
+        filesPath=path;
         //"C:\\Users\\Ygor Santos\\Desktop\\TestingEnvironment";
         //"C:\\Users\\Ygor Santos\\aws-sdk-java\\aws-java-sample";
     }
-    */
+    
     public ArrayList<File> sequentialFiles(String type) throws IOException{
         /*
         //String fileContent=null;

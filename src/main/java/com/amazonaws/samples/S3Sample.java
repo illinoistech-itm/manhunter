@@ -83,13 +83,17 @@ public class S3Sample {
     
     Scanner scan=new Scanner(System.in);
     ArrayList<String> bucketsList = new ArrayList<String>();
+    ArrayList<File> listOfEncryptedFiles;
+    ArrayList<String[]> keyPairs;
+    ArrayList<File> listOfEncryptedMetadataFiles=new ArrayList<File>();
+    ArrayList<ArrayList<String[]>>listOfKeywords = new ArrayList<ArrayList<String[]>>();
     
     public void menu(AmazonS3 s3) throws IOException, Exception{
         System.out.println("===========================================");
         System.out.println("Manhunter");
         System.out.println("===========================================\n");
         
-        FilesManagement filemgt = new FilesManagement();
+        FilesManagement filemgtEncData = new FilesManagement("src/encryptedData");
         boolean startOver=true;
         
         while(startOver){
@@ -102,18 +106,21 @@ public class S3Sample {
             System.out.println("2 - List buckets");
             System.out.println("3 - Delete buckets");
             System.out.println("4 - Download Object");
+            System.out.println("5 - First Attack (Result Count Comparison)");
             System.out.println("5 - Exit");
             System.out.print("Type your option: ");
             option=scan.nextInt();
 
             switch(option){
                 case 1:
-                    ArrayList<File> listOfFiles=filemgt.sequentialFiles("object");
-                    if(listOfFiles==null){
+                    
+                    listOfEncryptedFiles=filemgtEncData.sequentialFiles("object");
+                    listOfEncryptedMetadataFiles=filemgtEncData.sequentialFiles("metadata");
+                    if(listOfEncryptedFiles==null){
                         System.out.println("Error! No files found!");
                     }
-                    for(int i=0;i<listOfFiles.size();i++){
-                        createBuckets(s3,listOfFiles.get(i),filemgt);
+                    for(int i=0;i<listOfEncryptedFiles.size();i++){
+                        createBuckets(s3,listOfEncryptedFiles.get(i),filemgtEncData);
                     }
                 break;
                 case 2:
@@ -123,9 +130,29 @@ public class S3Sample {
                     deleteBucket(s3); 
                 break;
                 case 4:
-                    downloadObject(s3, filemgt);
+                    downloadObject(s3, filemgtEncData);
                 break;
                 case 5:
+                    FilesManagement fileMgtAttackNotEncrypted = new FilesManagement("src/data");
+                    //FilesManagement fileMgtAttackEncrypted = new FilesManagement("src/encryptedData");
+                    Attack attack = new Attack(filemgtEncData);
+                    attack.invertedMatrix(listOfEncryptedMetadataFiles, listOfEncryptedFiles);
+                    ArrayList<File>listOfNonEncryptedFiles=new ArrayList<File>();
+                    ArrayList<File>listOfNonEncryptedMetadataFiles=new ArrayList<File>();
+                    listOfNonEncryptedFiles=fileMgtAttackNotEncrypted.sequentialFiles("object");
+                    listOfNonEncryptedMetadataFiles=fileMgtAttackNotEncrypted.sequentialFiles("metadata");
+                    Attack attackNonEncrypted = new Attack(fileMgtAttackNotEncrypted);
+                    attackNonEncrypted.invertedMatrix(listOfNonEncryptedMetadataFiles,listOfNonEncryptedFiles);
+                    ArrayList<String[]>encryptedWords=new ArrayList<String[]>();
+                    ArrayList<String[]>notEncryptedWords=new ArrayList<String[]>();
+                    
+                    encryptedWords=attack.getWords();
+                    notEncryptedWords=attackNonEncrypted.getWords();
+                    
+                    compareWords(encryptedWords,notEncryptedWords);
+                    
+                break;
+                case 6:
                     System.out.println("Exiting.");
                     startOver=false;
                 break;
@@ -134,6 +161,10 @@ public class S3Sample {
                 break;
             }
         }
+    }
+    
+    public void compareWords(ArrayList<String[]>encryptedWords,ArrayList<String[]>notEncryptedWords){
+        
     }
     
     public void deleteBucket(AmazonS3 s3){
@@ -264,7 +295,7 @@ public class S3Sample {
                  * like content-type and content-encoding, plus additional metadata
                  * specific to your applications.
                  */
-                ArrayList<String[]> keyPairs = new ArrayList<String[]>();
+                keyPairs = new ArrayList<String[]>();
                 System.out.println("Uploading a new object to S3 from a file\n");
                 PutObjectRequest por=new PutObjectRequest(bucketName, key, fileName);
                 keyPairs=filemgt.wordSplit(filemgt.readMetadataFile(fileName));
@@ -336,6 +367,9 @@ public class S3Sample {
                         + "such as not being able to access the network.");
                 System.out.println("Error Message: " + ace.getMessage());
             }
+            
+            Attack attack = new Attack(filemgt);
+            attack.invertedMatrix(keyPairs, listOfEncryptedFiles, listOfEncryptedFiles);
         }
     
     private static void displayTextInputStream(InputStream input) throws IOException {

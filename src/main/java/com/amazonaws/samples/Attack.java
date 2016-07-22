@@ -22,17 +22,21 @@ import java.util.*;
  */
 public class Attack {
     
-    FilesManagement fmgt = new FilesManagement();
+    FilesManagement fmgt;
     ArrayList<String> allWords = new ArrayList<String>();
     int [][] invertedMatrix;
     ArrayList<String[]>wordsInFilesCount = new ArrayList<String[]>();
     
+    public Attack(FilesManagement FileManagementForAttack){
+        fmgt=FileManagementForAttack;
+        
+    }
     /*
     This function builds a 2-d array where each row corresponds to an encrypted keyword and each column corresponds to a document. 
     The entries of the matrix will be ‘1’ (or the count) if the word appears in the document, and ‘0’ if it doesn’t.
     */
     
-    public void invertedMatrix(int numberOfFiles, int numberOfWords, ArrayList<String[]> keypairwords, ArrayList<File> metadataFileList, ArrayList<File> filesList) throws IOException{
+    public void invertedMatrix(ArrayList<File> metadataFileList, ArrayList<File> filesList) throws IOException{
         
         for(int i=0; i<metadataFileList.size();i++){
             readFileForAttacks(metadataFileList.get(i));
@@ -54,6 +58,8 @@ public class Attack {
             }*/
         }
         
+        removeDuplicates();
+        
         invertedMatrix = new int[allWords.size()][metadataFileList.size()];
         
         for(int row=0;row<allWords.size();row++){
@@ -67,6 +73,11 @@ public class Attack {
                 }
             }
         }
+        for(int i=0;i<invertedMatrix.length;i++){
+            String keywordAndFrequency=allWords.get(i);
+            countNonZeroColumns(keywordAndFrequency);
+        }
+        SortingTheList();
     }
     
     /*
@@ -76,7 +87,7 @@ public class Attack {
     
     
     //This function must be called from within a loop going through every word in the list of words.
-    public int countNonZeroColumns(String word){
+    public void countNonZeroColumns(String word){
         int count=0;
         for(int column=0;column<invertedMatrix[0].length;column++){
             if(invertedMatrix[allWords.indexOf(word)][column]==1){
@@ -87,7 +98,20 @@ public class Attack {
         keywordAndCount[0]=word;
         keywordAndCount[1]=Integer.toString(count);
         wordsInFilesCount.add(keywordAndCount);
-        return count;
+        
+        //return count;
+    }
+    
+    public void removeDuplicates(){
+        int listSize = allWords.size();
+        ArrayList<String>temp = new ArrayList<String>();
+        for(int i=0;i<listSize;i++){
+            if(!(temp.contains(allWords.get(i)))){
+                temp.add(allWords.get(i));
+            }
+        }
+        allWords.clear();
+        allWords=temp;
     }
     
     public void SortingTheList(){
@@ -108,6 +132,8 @@ public class Attack {
             wordsInFilesCount.remove(y);
         }
         wordsInFilesCount=sortedList;   
+        
+        
     }
    
     /*
@@ -132,6 +158,10 @@ public class Attack {
         } finally {
             br.close();
         }  
+    }
+    
+    public ArrayList<String[]> getWords(){
+        return wordsInFilesCount;
     }
     
     public ArrayList<String> readWordsInFile(File file) throws FileNotFoundException, IOException{
