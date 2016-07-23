@@ -368,8 +368,6 @@ public class S3Sample {
                 System.out.println("Error Message: " + ace.getMessage());
             }
             
-            Attack attack = new Attack(filemgt);
-            attack.invertedMatrix(keyPairs, listOfEncryptedFiles, listOfEncryptedFiles);
         }
     
     private static void displayTextInputStream(InputStream input) throws IOException {
