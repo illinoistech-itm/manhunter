@@ -20,12 +20,14 @@ public class FilesManagement {
     ArrayList<String> MetadataFileNames=new ArrayList<String>();
     ArrayList<File> fileList = new ArrayList<File>();
     ArrayList<File> metadataFileList = new ArrayList<File>();
-    File folder = new File(filesPath);
-    File listOfFiles[] = folder.listFiles();
+    File folder;
+    File listOfFiles[];
     int numberOfFiles;
     
     public FilesManagement(String path){
         filesPath=path;
+        folder=new File(filesPath);
+        listOfFiles= folder.listFiles();
         //"C:\\Users\\Ygor Santos\\Desktop\\TestingEnvironment";
         //"C:\\Users\\Ygor Santos\\aws-sdk-java\\aws-java-sample";
     }
@@ -155,6 +157,46 @@ public class FilesManagement {
         } finally {
             br.close();
         }
+    }
+    
+    public void writeInFile(String word) throws FileNotFoundException{
+        String fileName=word;
+        PrintWriter writer = new PrintWriter("src/WordsToCompare/"+word);
+        writer.println(word);
+        writer.close();
+    }
+    
+    public ArrayList<String> readFilesWithRecentlyEncryptedWords() throws IOException{
+        ArrayList<String>temp=new ArrayList<String>();
+        File folder = new File("your/path");
+        File[] listOfFiles = folder.listFiles();
+
+        for (int i = 0; i < listOfFiles.length; i++) {
+            if (listOfFiles[i].isFile()) {
+                String tempWord=readFile(listOfFiles[i].getName());
+                temp.add(tempWord);
+                //System.out.println("File " + listOfFiles[i].getName());
+            } 
+        }
+        return temp;
+    }
+    
+    public String readFile(String fileName) throws FileNotFoundException, IOException{
+        String temp;
+        BufferedReader br = new BufferedReader(new FileReader(fileName));
+        try {
+            StringBuilder sb = new StringBuilder();
+            String line = br.readLine();
+
+            while (line != null) {
+                sb.append(line);
+                line = br.readLine();
+            }
+            temp = sb.toString();
+        } finally {
+            br.close();
+        }
+        return temp;
     }
     
     /*

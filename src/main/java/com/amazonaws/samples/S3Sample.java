@@ -40,6 +40,7 @@ import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -93,7 +94,9 @@ public class S3Sample {
         System.out.println("Manhunter");
         System.out.println("===========================================\n");
         
-        FilesManagement filemgtEncData = new FilesManagement("src/encryptedData");
+        String path="src/encryptedData";
+        
+        FilesManagement filemgtEncData = new FilesManagement(path);
         boolean startOver=true;
         
         while(startOver){
@@ -107,7 +110,7 @@ public class S3Sample {
             System.out.println("3 - Delete buckets");
             System.out.println("4 - Download Object");
             System.out.println("5 - First Attack (Result Count Comparison)");
-            System.out.println("5 - Exit");
+            System.out.println("6 - Exit");
             System.out.print("Type your option: ");
             option=scan.nextInt();
 
@@ -149,7 +152,7 @@ public class S3Sample {
                     encryptedWords=attack.getWords();
                     notEncryptedWords=attackNonEncrypted.getWords();
                     
-                    compareWords(encryptedWords,notEncryptedWords);
+                    compareWords(encryptedWords,notEncryptedWords,filemgtEncData);
                     
                 break;
                 case 6:
@@ -163,8 +166,25 @@ public class S3Sample {
         }
     }
     
-    public void compareWords(ArrayList<String[]>encryptedWords,ArrayList<String[]>notEncryptedWords){
+    public void compareWords(ArrayList<String[]>encryptedWords,ArrayList<String[]>notEncryptedWords, FilesManagement filemgt) throws FileNotFoundException{
+        for(int i=0; i<notEncryptedWords.size();i++){
+            filemgt.writeInFile((notEncryptedWords.get(i))[0]);
+        }
+        System.out.println("Run Python script to encrypt words.");
+        System.out.println("Press enter when done.");
+        scan.next();
         
+        ArrayList<String>recentlyEncryptedWords = new ArrayList<String>();
+        
+        recentlyEncryptedWords=filemgt.readFilesWithRecentlyEncryptedWords();
+        
+        for(int y=0; y<recentlyEncryptedWords.size();y++){
+            for(int g=0;g<encryptedWords.size();g++){
+                if(recentlyEncryptedWords.get(y)==(encryptedWords.get(g)[0])){
+                    System.out.println("Word retrieved.");
+                }
+            }
+        }
     }
     
     public void deleteBucket(AmazonS3 s3){
