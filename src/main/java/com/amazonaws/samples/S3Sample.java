@@ -166,7 +166,7 @@ public class S3Sample {
         }
     }
     
-    public void compareWords(ArrayList<String[]>encryptedWords,ArrayList<String[]>notEncryptedWords, FilesManagement filemgt) throws FileNotFoundException{
+    public void compareWords(ArrayList<String[]>encryptedWords,ArrayList<String[]>notEncryptedWords, FilesManagement filemgt) throws FileNotFoundException, IOException{
         for(int i=0; i<notEncryptedWords.size();i++){
             filemgt.writeInFile((notEncryptedWords.get(i))[0]);
         }
