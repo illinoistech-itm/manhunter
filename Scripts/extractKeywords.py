@@ -68,7 +68,11 @@ for filename in files:
 	
 	# Writing the values to a file.
 	os.chdir(newpath)
+<<<<<<< HEAD
 	txtOut = open(filename + "M", "w+")
+=======
+	txtOut = open(filename + "Data", "w+")
+>>>>>>> ba946fb888d50fd351a9cc13be9b1ded2c31c0d1
 	for key, value in zip(hex_dig, hashFrequency):
 		txtOut.write(str(key) + ":" + str(value) + "\n")
 	txtOut.close()
