@@ -99,6 +99,12 @@ public class S3Sample {
         FilesManagement filemgtEncData = new FilesManagement(path);
         boolean startOver=true;
         
+        listOfEncryptedFiles=filemgtEncData.sequentialFiles("object");
+        listOfEncryptedMetadataFiles=filemgtEncData.sequentialFiles("metadata");
+        
+        //System.out.println("Encrypted list: "+listOfEncryptedFiles.size());
+        //System.out.println("Encrypted Metadata list: "+listOfEncryptedMetadataFiles.size());
+        
         while(startOver){
         
             int option;
@@ -116,9 +122,6 @@ public class S3Sample {
 
             switch(option){
                 case 1:
-                    
-                    listOfEncryptedFiles=filemgtEncData.sequentialFiles("object");
-                    listOfEncryptedMetadataFiles=filemgtEncData.sequentialFiles("metadata");
                     if(listOfEncryptedFiles==null){
                         System.out.println("Error! No files found!");
                     }

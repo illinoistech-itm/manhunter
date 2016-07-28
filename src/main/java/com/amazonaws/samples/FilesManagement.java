@@ -32,6 +32,14 @@ public class FilesManagement {
         //"C:\\Users\\Ygor Santos\\aws-sdk-java\\aws-java-sample";
     }
     
+    public char lastCharacter(String n){
+        char last = (char)0;
+        for(char c : n.toCharArray()){
+            last=c;
+        }
+        return last;
+    }
+    
     public ArrayList<File> sequentialFiles(String type) throws IOException{
         /*
         //String fileContent=null;
@@ -47,10 +55,13 @@ public class FilesManagement {
         for (int i=0; i<listOfFiles.length;i++){//File file : listOfFiles) {
             if (listOfFiles[i].isFile()) {
                 String filename = listOfFiles[i].getName();
-                if(filename.substring(filename.length()-1)=="M"){
+                char last = lastCharacter(filename);
+                //System.out.println(last);
+                if(last=='M'){
                     //Gabriel
                     //InputStream fileContent = readMetadataFile(listOfFiles[i]);
                     //wordSplit(fileContent);
+                    System.out.println(listOfFiles[i].getName());
                     metadataFileList.add(listOfFiles[i]);
                     //System.out.println(filename);
                 }
@@ -73,6 +84,7 @@ public class FilesManagement {
         }
         else{
             if(type=="metadata"){
+                System.out.println("Metadata List Size: "+metadataFileList.size());
                 return metadataFileList;
             }
             else{
@@ -168,7 +180,7 @@ public class FilesManagement {
     
     public ArrayList<String> readFilesWithRecentlyEncryptedWords() throws IOException{
         ArrayList<String>temp=new ArrayList<String>();
-        File folder = new File("your/path");
+        File folder = new File("src/data/Encrypted/");
         File[] listOfFiles = folder.listFiles();
 
         for (int i = 0; i < listOfFiles.length; i++) {
@@ -183,7 +195,7 @@ public class FilesManagement {
     
     public String readFile(String fileName) throws FileNotFoundException, IOException{
         String temp;
-        BufferedReader br = new BufferedReader(new FileReader(fileName));
+        BufferedReader br = new BufferedReader(new FileReader("src/data/Encrypted/"+fileName));
         try {
             StringBuilder sb = new StringBuilder();
             String line = br.readLine();
